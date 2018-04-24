@@ -1,6 +1,6 @@
 from src.core.base import Database
 from src.postgres.commands import PostgresCommands
-from src.postgres.tables import PostgresTable
+from src.postgres.tables import PostgresTable, MigrationTable
 
 
 class PostgresDatabase(Database):
@@ -11,7 +11,6 @@ class PostgresDatabase(Database):
         self.commands = PostgresCommands
         self.add_show_create_table()
         self.table_class = PostgresTable
-
 
     def __del__(self):
         self.drop_show_create_table()

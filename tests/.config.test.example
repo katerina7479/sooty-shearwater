@@ -1,0 +1,5 @@
+[POSTGRES_TEST_DB]
+dbname: template1
+user: dbuser
+host: localhost
+password: dbpass

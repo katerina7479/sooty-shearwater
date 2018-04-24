@@ -35,10 +35,11 @@ class Table(object):
                 raise TypeError('Value %s, type %s not recognised as a number or string' % (val, type(val)))
         return ', '.join(escaped)
 
-    def _join_batch_rows(self, rows):
+    @staticmethod
+    def _join_batch_rows(rows):
         insert = ''
         for i, row in enumerate(rows):
-            insert += '({}), '.format(self._join_values(row))
+            insert += '({}), '.format(Table._join_values(row))
         return insert[:-2]
 
     @staticmethod

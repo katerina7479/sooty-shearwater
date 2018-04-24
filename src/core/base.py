@@ -1,4 +1,5 @@
 """Migration tool"""
+from tables import Table, MigrationTable
 
 
 class Database(object):
@@ -10,7 +11,8 @@ class Database(object):
         self.connection = connection.connect
         self.config = config
         self.commands = None
-        self.table_class = None
+        self.table_class = Table
+        self.migration_table_class = MigrationTable
 
     def commit(self):
         self.connection.commit()
@@ -47,3 +49,6 @@ class Database(object):
 
     def table(self, tablename, primary_key_column='id'):
         return self.table_class(self, tablename, primary_key_column)
+
+    def migration_table(self, source_table):
+        return self.migration_table_class(self, source_table, source_table.primary_key_column)
