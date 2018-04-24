@@ -3,7 +3,7 @@ import re
 import time
 import random
 import string
-from constraints import Constraint, ForeignKey, Index
+from src.core.constraints import Constraint, ForeignKey, Index
 
 
 class Table(object):
@@ -27,9 +27,9 @@ class Table(object):
         '''For values, create a join by type'''
         escaped = []
         for val in vals:
-            if isinstance(val, (int, float, long)):
+            if isinstance(val, (int, float)):
                 escaped.append('{}'.format(val))
-            elif isinstance(val, basestring):
+            elif isinstance(val, str):
                 escaped.append("'{}'".format(val.replace("'", "''")))
             else:
                 raise TypeError('Value %s, type %s not recognised as a number or string' % (val, type(val)))
@@ -48,11 +48,11 @@ class Table(object):
         return escaped string of key=val, key='val' for dictionary
         """
         equalities = []
-        for key, val in row_dict.iteritems():
+        for key, val in row_dict.items():
             temp = '{}='.format(key)
-            if isinstance(val, (int, float, long)):
+            if isinstance(val, (int, float)):
                 temp += '{}'.format(val)
-            elif isinstance(val, basestring):
+            elif isinstance(val, str):
                 temp += '\'{}\''.format(val)
             else:
                 raise TypeError('Value %s, type %s not recognised as a number or string' % (val, type(val)))
@@ -516,7 +516,7 @@ class MigrationTable(Table):
 
     def delete_triggers(self):
         """Delete the triggers"""
-        for trigger_method, trigger_name in self.triggers.iteritems():
+        for trigger_method, trigger_name in self.triggers.items():
                 self.execute(self.commands.drop_trigger(trigger_name, self.source.name))
                 function_name = '{}_{}'.format(trigger_method.lower(), self.name)
                 self.execute(self.commands.drop_function(function_name))

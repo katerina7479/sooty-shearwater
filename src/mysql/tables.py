@@ -15,11 +15,11 @@ class MysqlTable(Table):
         return escaped string of `key`=val, `key`='val' for dictionary
         '''
         equalities = []
-        for key, val in row_dict.iteritems():
+        for key, val in row_dict.items():
             temp = '`{}`='.format(key)
             if isinstance(val, (int, float)):
                 temp += '{}'.format(val)
-            elif isinstance(val, basestring):
+            elif isinstance(val, str):
                 temp += '\'{}\''.format(val)
             else:
                 raise TypeError('Value %s, type %s not recognised as a number or string' % (val, type(val)))

@@ -8,7 +8,7 @@ class Database(object):
     def __init__(self, name, connection, config):
         """Initialize the database"""
         self.name = name
-        self.connection = connection.connect
+        self.connection = connection
         self.config = config
         self.commands = None
         self.table_class = Table

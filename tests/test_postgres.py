@@ -9,13 +9,13 @@ from src.core.tables import *
 # pylint: disable=print-statement
 
 Config = configparser.ConfigParser()
-Config.read('.config.test')
+Config.read('tests/.config.test')
 section = 'POSTGRES_TEST_DB'
 TEST_DB = {
-    'dbname': Config[section]['dbname'],
-    'user': Config[section]['user'],
-    'host': Config[section]['host'],
-    'password': Config[section]['password']
+    'dbname': Config.get(section, 'dbname'),
+    'user': Config.get(section, 'user'),
+    'host': Config.get(section, 'host'),
+    'password': Config.get(section, 'password')
 }
 
 
@@ -26,8 +26,8 @@ class TestPostgresTable(unittest.TestCase):
     def setUp(self):
         """Create a test table"""
 
-        self.connection = psycopg2.connect()
-        dbf = DatabaseFactory(**TEST_DB)
+        self.connection = psycopg2.connect(**TEST_DB)
+        dbf = DatabaseFactory(TEST_DB['dbname'], self.connection)
         self.db = dbf.fetch()
         self.employers = self.db.table('employers')
         self.users = self.db.table('users')
@@ -235,8 +235,8 @@ class TestPostgresTable(unittest.TestCase):
 class TestMigrationTable(unittest.TestCase):
 
     def setUp(self):
-        self.connection = psycopg2.connect()
-        dbf = DatabaseFactory(**TEST_DB)
+        self.connection = psycopg2.connect(**TEST_DB)
+        dbf = DatabaseFactory(TEST_DB['dbname'], self.connection)
         self.db = dbf.fetch()
         self.users = self.db.table(self.db, 'users')
         self.users.drop()
@@ -324,8 +324,8 @@ class TestMigrationTable(unittest.TestCase):
 class TestComplexMigrations(unittest.TestCase):
 
     def setUp(self):
-        self.connection = psycopg2.connect()
-        dbf = DatabaseFactory(**TEST_DB)
+        self.connection = psycopg2.connect(**TEST_DB)
+        dbf = DatabaseFactory(TEST_DB['dbname'], self.connection)
         self.db = dbf.fetch()
         self.users = self.db.table(self.db, 'users')
         self.address = self.db.table(self.db, 'address')

@@ -10,7 +10,7 @@ class PostgresCommands(object):
     def get_tables(database_name):
         return '''SELECT DISTINCT(tablename)
                     FROM pg_catalog.pg_tables
-                    WHERE schemaname == '{}'
+                    WHERE schemaname = '{}'
                  '''.format(database_name)
 
     show_table_function = """CREATE OR REPLACE FUNCTION show_create_table(p_table_name varchar)
