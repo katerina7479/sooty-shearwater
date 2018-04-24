@@ -121,6 +121,8 @@ class Table(object):
             self.drop_foreign_keys()
             self.execute(self.commands.drop_table(self.name, cascade))
             self.commit()
+        else:
+            print("Table {} does not exist".format(self.name))
 
     # Row Methods
     def get_row(self, pk):

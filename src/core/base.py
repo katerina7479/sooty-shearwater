@@ -48,7 +48,7 @@ class Database(object):
         return table_name in self.tables
 
     def table(self, tablename, primary_key_column='id'):
-        return self.table_class(self, tablename, primary_key_column)
+        return self.table_class(database=self, name=tablename, primary_key_column=primary_key_column)
 
     def migration_table(self, source_table):
-        return self.migration_table_class(self, source_table, source_table.primary_key_column)
+        return self.migration_table_class(database=self, source_table=source_table, primary_key_column=source_table.primary_key_column)

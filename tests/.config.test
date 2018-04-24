@@ -1,5 +1,5 @@
 [POSTGRES_TEST_DB]
-dbname: template1
+dbname: testing
 user: katerina
 host: localhost
 password:
