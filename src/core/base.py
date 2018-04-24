@@ -1,5 +1,5 @@
 """Migration tool"""
-from tables import Table, MigrationTable
+from src.core.tables import Table, MigrationTable
 
 
 class Database(object):

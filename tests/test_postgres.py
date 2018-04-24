@@ -1,14 +1,14 @@
 """Test model migration tool"""
 import psycopg2
 import unittest
-import ConfigParser
+import configparser
 from src import DatabaseFactory
 from src.core.constraints import *
-from src.core import tables
+from src.core.tables import *
 
 # pylint: disable=print-statement
 
-Config = ConfigParser.ConfigParser()
+Config = configparser.ConfigParser()
 Config.read('.config.test')
 section = 'POSTGRES_TEST_DB'
 TEST_DB = {
@@ -407,41 +407,41 @@ class TestUtils(unittest.TestCase):
     """Test util functions"""
 
     def test_join_cols(self):
-        ans = tables.Table._join_cols(['this', 'that', 'something'])
+        ans = Table._join_cols(['this', 'that', 'something'])
         self.assertEqual(ans, 'this, that, something')
 
     def test_join_values(self):
-        ans = tables.Table._join_values(['this', 1, 7.0, 'that'])
+        ans = Table._join_values(['this', 1, 7.0, 'that'])
         self.assertEqual(ans, "'this', 1, 7.0, 'that'")
 
         with self.assertRaises(TypeError):
-            tables.Table._join_values([('this', "won't"), 'work'])
+            Table._join_values([('this', "won't"), 'work'])
 
     def test_join_conditionals(self):
-        ans = tables.Table._join_equality({'this': 'that', 'something': 3})
+        ans = Table._join_equality({'this': 'that', 'something': 3})
         self.assertEqual(ans, "this='that', something=3")
 
         with self.assertRaises(TypeError):
-            tables.Table._join_equality({'this': ("won't", 'work')})
+            Table._join_equality({'this': ("won't", 'work')})
 
     def test_qualify(self):
-        ans = tables.Table._qualify('mytable', ['col1', 'col2', 'col3'])
+        ans = Table._qualify('mytable', ['col1', 'col2', 'col3'])
         self.assertEqual(ans, 'mytable.col1, mytable.col2, mytable.col3')
 
     def test_equals(self):
-        ans = tables.Table._equals(['this', 'something'], 'new_table', ['that', 'something_else'])
+        ans = Table._equals(['this', 'something'], 'new_table', ['that', 'something_else'])
         self.assertEqual(ans, 'this=new_table.that, something=new_table.something_else')
 
     def test_dictify(self):
-        ans = tables.Table._dictify(['col1', 'col2', 'col3'], ['val1', 'val2', 'val3'])
+        ans = Table._dictify(['col1', 'col2', 'col3'], ['val1', 'val2', 'val3'])
         self.assertDictEqual(ans, {'col2': 'val2', 'col3': 'val3', 'col1': 'val1'})
 
     def test_random_string(self):
-        ans = tables.Table._random_string(5)
+        ans = Table._random_string(5)
         self.assertEqual(len(ans), 5)
 
     def test_join_batch_rows(self):
-        ans = tables.Table._join_batch_rows([('this', 'that'), ('something', "something's else")])
+        ans = Table._join_batch_rows([('this', 'that'), ('something', "something's else")])
         self.assertEqual(ans, "('this', 'that'), ('something', 'something''s else')")
 
 

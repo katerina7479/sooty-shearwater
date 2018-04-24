@@ -131,8 +131,8 @@ class MySqlMigrationTable(MysqlTable, MigrationTable):
                     self.create_triggers()
                     return False
                 # TODO: make sure this is a Lock wait timeout error before retrying
-                print 'rename retry %d, error: %s' % (retries, e)
+                print('rename retry %d, error: %s' % (retries, e))
                 time.sleep(self.db.donfig['RETRY_SLEEP_TIME'])
         self.name, self.source.name = self.source.name, self.archive_name
-        print "Rename complete!"
+        print("Rename complete!")
         return True

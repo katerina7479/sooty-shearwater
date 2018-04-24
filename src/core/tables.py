@@ -230,7 +230,7 @@ class Table(object):
         try:
             self.execute(sql)
         except Exception as e:
-            print 'Unable to add constraint: {}'.format(e)
+            print('Unable to add constraint: {}'.format(e))
         self.commit()
 
     def drop_constraint(self, name):
@@ -289,7 +289,7 @@ class Table(object):
             ))
             self.commit()
         except Exception as e:
-            print 'Cannot add fk {}, Integrity Error: {}'.format(sql, e)
+            print('Cannot add fk Integrity Error: {}'.format(e))
 
     def drop_foreign_keys(self):
         """Drops the table's foreign keys"""
@@ -298,7 +298,7 @@ class Table(object):
                 self.drop_foreign_key(key.table_name, key.name)
             except:
                 # Dropping items that are not there
-                print 'Tried to drop key {}, did not exist'.format(key.name)
+                print('Tried to drop key {}, did not exist'.format(key.name))
 
     def drop_foreign_key(self, fk_table_name, fk_name):
         """Drop a foreign key constraint"""
@@ -547,7 +547,7 @@ class MigrationTable(Table):
                 self._copy_chunk(pointer)
                 self.log(start, pointer, limit)
 
-        print 'Copy complete! Adding referenced foreign keys'
+        print('Copy complete! Adding referenced foreign keys')
         referenced_fks = [x for x in self.source.foreign_keys if x.referenced]
         self.add_foreign_keys(referenced_fks, override_table=self.name)
         return True
@@ -592,9 +592,9 @@ class MigrationTable(Table):
             self.execute(self.commands.COMMIT)
             success = True
         except Exception as e:
-            print e
+            print('Rename Error', e)
         if success:
-            print 'Rename complete!'
+            print('Rename complete!')
             new = Table(self.db, source_name)
             archive = Table(self.source.db, archive_name)
             self.move_sequences(archive, new.name)
@@ -617,10 +617,10 @@ class MigrationTable(Table):
             run_time = (datetime.datetime.now() - self.start_time).total_seconds()
             remaining = (run_time / percent_complete) - run_time
             time_remaining = datetime.timedelta(seconds=remaining)
-            print 'Processed %d/%d %.2f%% - time left: %s' % (
-            current, last, percent_complete * 100, str(time_remaining))
+            print('Processed %d/%d %.2f%% - time left: %s' % (
+            current, last, percent_complete * 100, str(time_remaining)))
         except TypeError:
-            print 'Processed pk {} limit is {}'.format(current, last)
+            print('Processed pk {} limit is {}'.format(current, last))
 
 
 class Intersection(object):
