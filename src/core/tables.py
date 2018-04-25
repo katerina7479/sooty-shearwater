@@ -538,7 +538,7 @@ class MigrationTable(Table):
             self.start_time = datetime.datetime.now()
 
             pointer = start
-            if not pointer or limit:
+            if not (pointer and limit):
                 pass
             else:
                 while pointer < limit:
