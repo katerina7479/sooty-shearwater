@@ -10,8 +10,9 @@ class PostgresCommands(object):
     def get_tables(database_name):
         return '''SELECT DISTINCT(tablename)
                     FROM pg_catalog.pg_tables
-                    WHERE schemaname = '{}'
-                 '''.format(database_name)
+                    WHERE schemaname != 'pg_catalog'
+                    AND schemaname != 'information_schema'
+                 '''
 
     show_table_function = """CREATE OR REPLACE FUNCTION show_create_table(p_table_name varchar)
                   RETURNS text AS
@@ -104,7 +105,7 @@ class PostgresCommands(object):
     def create_table(tablename, primary_key_col):
         return '''CREATE TABLE
                   IF NOT EXISTS {}
-                  ({} SERIAL PRIMARY KEY
+                  ({} SERIAL PRIMARY KEY)
                '''.format(tablename, primary_key_col)
 
     @staticmethod

@@ -35,7 +35,6 @@ class TestPostgresTable(unittest.TestCase):
         # Remove later
         self.employers.drop()
         self.users.drop(cascade=True)
-
         self.users.create_from_statement("""
             CREATE TABLE users (
             id SERIAL PRIMARY KEY,
@@ -78,7 +77,7 @@ class TestPostgresTable(unittest.TestCase):
 
     def test_table(self):
         """Test base table"""
-        b = self.db.table(self.db, 'users')
+        b = self.db.table('users')
         create = b.create_statement
         self.assertEqual(create, 'CREATE TABLE {} ( id integer DEFAULT nextval(\'users_id_seq\'::regclass) NOT NULL, name character varying(20) NULL);')
 
@@ -164,7 +163,7 @@ class TestPostgresTable(unittest.TestCase):
         self.assertEqual(fk.fk_table_name, 'users')
 
     def test_additional_fks(self):
-        address = self.db.table(self.db, 'address')
+        address = self.db.table('address')
         address.create()
         add_fks = address.foreign_keys
         self.assertListEqual(add_fks, [])
@@ -181,7 +180,7 @@ class TestPostgresTable(unittest.TestCase):
         self.assertEqual(fk.table_name, 'address')
         self.assertEqual(fk.fk_table_name, 'users')
 
-        new_address = self.db.table(self.db, 'new_address')
+        new_address = self.db.table('new_address')
         new_address.create_from_statement(address.create_statement)
 
         new_address.add_foreign_keys(fks)
@@ -232,13 +231,13 @@ class TestPostgresTable(unittest.TestCase):
         self.assertListEqual(triggers, [])
 
 
-class TestMigrationTable(unittest.TestCase):
+class TestPostgresMigrationTable(unittest.TestCase):
 
     def setUp(self):
         self.connection = psycopg2.connect(**TEST_DB)
         dbf = DatabaseFactory(TEST_DB['dbname'], self.connection)
         self.db = dbf.fetch()
-        self.users = self.db.table(self.db, 'users')
+        self.users = self.db.table('users')
         self.users.drop()
 
         self.users.create_from_statement('''
@@ -321,86 +320,86 @@ class TestMigrationTable(unittest.TestCase):
         archive.drop()
 
 
-class TestComplexMigrations(unittest.TestCase):
-
-    def setUp(self):
-        self.connection = psycopg2.connect(**TEST_DB)
-        dbf = DatabaseFactory(TEST_DB['dbname'], self.connection)
-        self.db = dbf.fetch()
-        self.users = self.db.table(self.db, 'users')
-        self.address = self.db.table(self.db, 'address')
-        self.org = self.db.table(self.db, 'org')
-
-        self.org.drop(cascade=True)
-        self.users.drop(cascade=True)
-        self.address.drop(cascade=True)
-
-        self.org.create_from_statement('''
-            CREATE TABLE org (
-            id SERIAL PRIMARY KEY,
-            name VARCHAR(40) UNIQUE NOT NULL)''')
-
-        self.users.create_from_statement('''
-            CREATE TABLE users (
-            id SERIAL PRIMARY KEY,
-            name varchar(20) UNIQUE,
-            created_at TIMESTAMP,
-            friend_id INTEGER REFERENCES users(id),
-            org_id INTEGER REFERENCES org(id)
-            );''')
-        self.users.add_index(['created_at'])
-
-        self.address.create_from_statement('''
-            CREATE TABLE address (
-            id SERIAL PRIMARY KEY,
-            address text,
-            city varchar(20),
-            state varchar(2),
-            zip integer NOT NULL,
-            user_id INTEGER references users(id)
-            );''')
-
-        self.org.insert_row({'name': 'Friend Face'})
-        self.org.insert_row({'name': 'Social Nook'})
-        self.users.insert_row({'name': 'founder', 'friend_id': 1, 'org_id': 1})
-        self.users.insert_row({'name': 'early adopter', 'friend_id': 1, 'org_id': 2})
-
-        self.address.insert_row({'zip': 90120, 'address': 'test place', 'user_id': 1})
-        self.address.insert_row({'zip': 70433, 'address': 'awful place', 'user_id': 2})
-
-    def tearDown(self):
-        self.org.drop(cascade=True)
-        self.users.drop(cascade=True)
-        self.address.drop(cascade=True)
-
-    def test_with_foreign_keys(self):
-        """Test with multiple foreign keys"""
-        new_users = self.db.migration_table(self.users)
-
-        self.assertEqual(len(self.users.constraints), 3)
-        self.assertEqual(len(self.users.foreign_keys), 3)
-        self.assertEqual(len(self.users.indexes), 3)
-
-        self.assertEqual(len(new_users.constraints), 0)
-        self.assertEqual(len(new_users.foreign_keys), 0)
-        self.assertEqual(len(new_users.indexes), 0)
-
-        new_users.create_from_source()
-
-        self.assertEqual(len(new_users.constraints), 3)
-        self.assertEqual(len(new_users.foreign_keys), 1)
-        self.assertEqual(len(new_users.indexes), 3)
-
-        new_users.add_column('profession', 'varchar(20)')
-        new_users.copy_in_chunks()
-        self.assertEqual(len(new_users.foreign_keys), 3)
-        self.users, archive = new_users.rename_tables()
-
-        self.assertEqual(len(self.users.constraints), 3)
-        self.assertEqual(len(self.users.foreign_keys), 3)
-        self.assertEqual(len(self.users.indexes), 3)
-
-        archive.drop()
+# class TestComplexMigrations(unittest.TestCase):
+#
+#     def setUp(self):
+#         self.connection = psycopg2.connect(**TEST_DB)
+#         dbf = DatabaseFactory(TEST_DB['dbname'], self.connection)
+#         self.db = dbf.fetch()
+#         self.users = self.db.table('users')
+#         self.address = self.db.table('address')
+#         self.org = self.db.table('org')
+#
+#         self.org.drop(cascade=True)
+#         self.users.drop(cascade=True)
+#         self.address.drop(cascade=True)
+#
+#         self.org.create_from_statement('''
+#             CREATE TABLE org (
+#             id SERIAL PRIMARY KEY,
+#             name VARCHAR(40) UNIQUE NOT NULL)''')
+#
+#         self.users.create_from_statement('''
+#             CREATE TABLE users (
+#             id SERIAL PRIMARY KEY,
+#             name varchar(20) UNIQUE,
+#             created_at TIMESTAMP,
+#             friend_id INTEGER REFERENCES users(id),
+#             org_id INTEGER REFERENCES org(id)
+#             )''')
+#         self.users.add_index(['created_at'])
+#
+#         self.address.create_from_statement('''
+#             CREATE TABLE address (
+#             id SERIAL PRIMARY KEY,
+#             address text,
+#             city varchar(20),
+#             state varchar(2),
+#             zip integer NOT NULL,
+#             user_id INTEGER references users(id)
+#             )''')
+#
+#         self.org.insert_row({'name': 'Friend Face'})
+#         self.org.insert_row({'name': 'Social Nook'})
+#         self.users.insert_row({'name': 'founder', 'friend_id': 1, 'org_id': 1})
+#         self.users.insert_row({'name': 'early adopter', 'friend_id': 1, 'org_id': 2})
+#
+#         self.address.insert_row({'zip': 90120, 'address': 'test place', 'user_id': 1})
+#         self.address.insert_row({'zip': 70433, 'address': 'awful place', 'user_id': 2})
+#
+#     def tearDown(self):
+#         self.org.drop(cascade=True)
+#         self.users.drop(cascade=True)
+#         self.address.drop(cascade=True)
+#
+#     def test_with_foreign_keys(self):
+#         """Test with multiple foreign keys"""
+#         new_users = self.db.migration_table(self.users)
+#
+#         self.assertEqual(len(self.users.constraints), 3)
+#         self.assertEqual(len(self.users.foreign_keys), 3)
+#         self.assertEqual(len(self.users.indexes), 3)
+#
+#         self.assertEqual(len(new_users.constraints), 0)
+#         self.assertEqual(len(new_users.foreign_keys), 0)
+#         self.assertEqual(len(new_users.indexes), 0)
+#
+#         new_users.create_from_source()
+#
+#         self.assertEqual(len(new_users.constraints), 3)
+#         self.assertEqual(len(new_users.foreign_keys), 1)
+#         self.assertEqual(len(new_users.indexes), 3)
+#
+#         new_users.add_column('profession', 'varchar(20)')
+#         new_users.copy_in_chunks()
+#         self.assertEqual(len(new_users.foreign_keys), 3)
+#         self.users, archive = new_users.rename_tables()
+#
+#         self.assertEqual(len(self.users.constraints), 3)
+#         self.assertEqual(len(self.users.foreign_keys), 3)
+#         self.assertEqual(len(self.users.indexes), 3)
+#
+#         archive.drop()
 
 
 class TestUtils(unittest.TestCase):
