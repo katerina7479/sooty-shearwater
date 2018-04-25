@@ -1,4 +1,5 @@
 import time
+import re
 from src.core.tables import Table, MigrationTable
 
 
@@ -68,6 +69,17 @@ class MysqlTable(Table):
             self.get_column_definition(old_name))
         )
 
+    @property
+    def create_statement(self):
+        """Get table create statement"""
+        query = self.commands.get_table_create_statement(self.name)
+        if self.db.table_exists(self.name):
+            statement = self.execute(query)[0][1]
+            print("statement", statement)
+            statement = re.sub('\s+', ' ', statement)
+            return statement
+        raise ValueError('Table does not exist, no create statement')
+
 
 class MySqlMigrationTable(MysqlTable, MigrationTable):
 
@@ -131,7 +143,7 @@ class MySqlMigrationTable(MysqlTable, MigrationTable):
                     self.create_triggers()
                     return False
                 # TODO: make sure this is a Lock wait timeout error before retrying
-                print('rename retry %d, error: %s' % (retries, e))
+                print('Rename retry %d, error: %s' % (retries, e))
                 time.sleep(self.db.donfig['RETRY_SLEEP_TIME'])
         self.name, self.source.name = self.source.name, self.archive_name
         print("Rename complete!")

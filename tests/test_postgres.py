@@ -19,7 +19,6 @@ TEST_DB = {
 }
 
 
-
 class TestPostgresTable(unittest.TestCase):
     """Test for migration models"""
 

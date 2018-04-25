@@ -101,7 +101,6 @@ class Table(object):
     def create_statement(self):
         """Get table create statement"""
         query = self.commands.get_table_create_statement(self.name)
-
         if self.db.table_exists(self.name):
             statement = self.execute(query)[0][0]
             statement = re.sub('\s+', ' ', statement)

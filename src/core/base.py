@@ -13,6 +13,7 @@ class Database(object):
         self.commands = None
         self.table_class = Table
         self.migration_table_class = MigrationTable
+        self.last_row = None
 
     def commit(self):
         self.connection.commit()
@@ -23,6 +24,7 @@ class Database(object):
             if sql[-1] != ';':
                 sql += ';'
             dbc.execute(sql)
+            self.last_row = dbc.lastrowid
             try:
                 return dbc.fetchall()
             except:
