@@ -3,8 +3,8 @@ import psycopg2
 import unittest
 import configparser
 from src import DatabaseFactory
-from src.core.constraints import *
-from src.core.tables import *
+from src.core.constraints import Constraint, Index
+from src.core.tables import Table
 
 # pylint: disable=print-statement
 
