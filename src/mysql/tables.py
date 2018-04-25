@@ -90,6 +90,14 @@ class MysqlTable(Table):
 
 class MySqlMigrationTable(MysqlTable, MigrationTable):
 
+    def create_from_source(self):
+        """Create new table like source_table"""
+        create_statement = self.source.create_statement.replace(
+            'CREATE TABLE `{}`'.format(self.source.name),
+            'CREATE TABLE `{}`'
+        )
+        self.create_from_statement(create_statement)
+
     def _trigger_name(self, method_type):
         'Create trigger name'
         name = 'migration_trigger_{}_{}'.format(method_type, self.source.name)

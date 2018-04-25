@@ -239,47 +239,47 @@ class TestMySQLTable(unittest.TestCase):
         self.assertListEqual(triggers, [])
 
 
-# class TestMySQLMigrationTable(unittest.TestCase):
-#
-#     def setUp(self):
-#         self.connection = MySQLdb.connect(**TEST_DB)
-#         dbf = DatabaseFactory(TEST_DB['db'], self.connection, CONFIG)
-#         self.db = dbf.fetch()
-#         self.users = self.db.table('users')
-#         self.users.drop(cascade=True)
-#
-#         self.users.create_from_statement('''
-#             CREATE TABLE users (
-#             id SERIAL PRIMARY KEY,
-#             name varchar(20),
-#             address text,
-#             city varchar(20),
-#             state varchar(2),
-#             zip integer
-#             );'''
-#         )
-#
-#         self.users.insert_row({'name': 'J.J Abrams', 'address': '1221 Olympic Boulevard',
-#                                'city': 'Santa Monica', 'state': 'CA', 'zip': 90404})
-#
-#         self.users.insert_row({'name': 'Joss Whedon', 'address': 'P.O. Box 988',
-#                                'city': 'Malibu', 'state': 'CA', 'zip': 90265})
-#
-#     def tearDown(self):
-#         self.users.drop(cascade=True)
-#
-#     def test_migrate(self):
-#         new_users = self.db.migration_table(self.users)
-#         new_users.create_from_source()
-#
-#         index = new_users.indexes[0]
-#         self.assertIn('_pkey', index.name)
-#         self.assertTrue(isinstance(index, Index))
-#
-#         primary_key = new_users.primary_key
-#         self.assertIn('_pkey', primary_key.name)
-#         self.assertTrue(isinstance(primary_key, Constraint))
-#         new_users.drop()
+class TestMySQLMigrationTable(unittest.TestCase):
+
+    def setUp(self):
+        self.connection = MySQLdb.connect(**TEST_DB)
+        dbf = DatabaseFactory(TEST_DB['db'], self.connection, CONFIG)
+        self.db = dbf.fetch()
+        self.users = self.db.table('users')
+        self.users.drop(cascade=True)
+
+        self.users.create_from_statement('''
+            CREATE TABLE users (
+            id SERIAL PRIMARY KEY,
+            name varchar(20),
+            address text,
+            city varchar(20),
+            state varchar(2),
+            zip integer
+            );'''
+        )
+
+        self.users.insert_row({'name': 'J.J Abrams', 'address': '1221 Olympic Boulevard',
+                               'city': 'Santa Monica', 'state': 'CA', 'zip': 90404})
+
+        self.users.insert_row({'name': 'Joss Whedon', 'address': 'P.O. Box 988',
+                               'city': 'Malibu', 'state': 'CA', 'zip': 90265})
+
+    def tearDown(self):
+        self.users.drop(cascade=True)
+
+    def test_migrate(self):
+        new_users = self.db.migration_table(self.users)
+        new_users.create_from_source()
+
+        index = new_users.indexes[0]
+        self.assertIn('PRIMARY', index.name)
+        self.assertTrue(isinstance(index, Index))
+
+        primary_key = new_users.primary_key
+        self.assertIn('PRIMARY', primary_key.name)
+        self.assertTrue(isinstance(primary_key, Constraint))
+        new_users.drop()
 #
 #     def test_rename_triggers(self):
 #         new_users = self.db.migration_table(self.users)
