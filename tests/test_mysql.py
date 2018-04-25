@@ -280,52 +280,52 @@ class TestMySQLMigrationTable(unittest.TestCase):
         self.assertIn('PRIMARY', primary_key.name)
         self.assertTrue(isinstance(primary_key, Constraint))
         new_users.drop()
-#
-#     def test_rename_triggers(self):
-#         new_users = self.db.migration_table(self.users)
-#         new_users.create_from_source()
-#
-#         new_users.rename_column('zip', 'zipcode')
-#         self.assertEqual(new_users.renames[0], ('zip', 'zipcode'))
-#         self.assertListEqual(new_users.intersection.origin_columns, ['address', 'city', 'id', 'name', 'state', 'zip'])
-#         self.assertListEqual(new_users.intersection.origin_renames, ['zip'])
-#         self.assertListEqual(new_users.intersection.dest_renames, ['zipcode'])
-#         self.assertListEqual(new_users.intersection.dest_columns, ['address', 'city', 'id', 'name', 'state', 'zipcode'])
-#         self.assertListEqual(new_users.intersection.intersection, ['address', 'city', 'id', 'name', 'state'])
-#
-#         new_users.create_triggers()
-#
-#         id = self.users.insert_row({'name': 'Damien Chazelle', 'address': '1223 Wilshire Blvd.',
-#                                     'city': 'Santa Monica', 'state': 'CA', 'zip': 90403})
-#         row = new_users.get_row(id)
-#         self.assertDictEqual(row, {'city': 'Santa Monica', 'name': 'Damien Chazelle', 'zipcode': 90403, 'state': 'CA', 'address': '1223 Wilshire Blvd.', 'id': 3})
-#         count = new_users.count
-#         self.assertEqual(count, 1)
-#
-#         self.users.delete_row(1)
-#         self.assertEqual(self.users.count, 2)
-#         self.assertEqual(new_users.count, 1)
-#
-#         self.users.update_row(2, {'address': '1003 Amherst Ave.', 'city': 'Los Angeles', 'zip': 90049})
-#         self.assertEqual(self.users.count, 2)
-#         self.assertEqual(new_users.count, 1)
-#
-#         self.users.delete_row(3)
-#         self.assertEqual(self.users.count, 1)
-#         self.assertEqual(new_users.count, 0)
-#
-#         new_users.drop()
-#
-#     def test_copy_in_chunks(self):
-#         new_users = self.db.migration_table(self.users)
-#         new_users.create_from_source()
-#         new_users.rename_column('zip', 'zipcode')
-#
-#         new_users.copy_in_chunks()
-#
-#         self.assertEqual(new_users.count, self.users.count)
-#         self.users, archive = new_users.rename_tables()
-#         archive.drop()
+
+    def test_rename_triggers(self):
+        new_users = self.db.migration_table(self.users)
+        new_users.create_from_source()
+
+        new_users.rename_column('zip', 'zipcode')
+        self.assertEqual(new_users.renames[0], ('zip', 'zipcode'))
+        self.assertListEqual(new_users.intersection.origin_columns, ['address', 'city', 'id', 'name', 'state', 'zip'])
+        self.assertListEqual(new_users.intersection.origin_renames, ['zip'])
+        self.assertListEqual(new_users.intersection.dest_renames, ['zipcode'])
+        self.assertListEqual(new_users.intersection.dest_columns, ['address', 'city', 'id', 'name', 'state', 'zipcode'])
+        self.assertListEqual(new_users.intersection.intersection, ['address', 'city', 'id', 'name', 'state'])
+
+        new_users.create_triggers()
+
+        id = self.users.insert_row({'name': 'Damien Chazelle', 'address': '1223 Wilshire Blvd.',
+                                    'city': 'Santa Monica', 'state': 'CA', 'zip': 90403})
+        row = new_users.get_row(id)
+        self.assertDictEqual(row, {'city': 'Santa Monica', 'name': 'Damien Chazelle', 'zipcode': 90403, 'state': 'CA', 'address': '1223 Wilshire Blvd.', 'id': 3})
+        count = new_users.count
+        self.assertEqual(count, 1)
+
+        self.users.delete_row(1)
+        self.assertEqual(self.users.count, 2)
+        self.assertEqual(new_users.count, 1)
+
+        self.users.update_row(2, {'address': '1003 Amherst Ave.', 'city': 'Los Angeles', 'zip': 90049})
+        self.assertEqual(self.users.count, 2)
+        self.assertEqual(new_users.count, 1)
+
+        self.users.delete_row(3)
+        self.assertEqual(self.users.count, 1)
+        self.assertEqual(new_users.count, 0)
+
+        new_users.drop()
+
+    # def test_copy_in_chunks(self):
+    #     new_users = self.db.migration_table(self.users)
+    #     new_users.create_from_source()
+    #     new_users.rename_column('zip', 'zipcode')
+    #
+    #     new_users.copy_in_chunks()
+    #
+    #     self.assertEqual(new_users.count, self.users.count)
+    #     self.users, archive = new_users.rename_tables()
+    #     archive.drop()
 #
 #
 # class TestMySQLComplexMigrations(unittest.TestCase):

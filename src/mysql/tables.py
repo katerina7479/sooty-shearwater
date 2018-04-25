@@ -114,6 +114,10 @@ class MySqlMigrationTable(MysqlTable, MigrationTable):
             self.name,
             self._join_cols(self.intersection.dest_columns),
             self._qualify('NEW', self.intersection.origin_columns))
+        import pdb
+        pdb.set_trace()
+
+        print(sql)
         self.execute(sql)
 
     def create_delete_trigger(self):
