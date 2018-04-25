@@ -14,7 +14,7 @@ class Constraint(object):
         self.name = name
         self.table_name = table_name
         if type not in self.allowed_types:
-            raise TypeError('Constraint Type not in {}'.format(self.allowed_types))
+            raise TypeError('Constraint Type {} not in {}'.format(type, self.allowed_types))
         self.type = type
         self.column = column
         self.check_clause = check_clause

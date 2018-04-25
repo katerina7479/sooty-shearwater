@@ -101,40 +101,40 @@ class TestMySQLTable(unittest.TestCase):
         self.users.delete_row(3)
         row = self.users.get_row(3)
         self.assertIsNone(row)
-    #
-    # def test_count(self):
-    #     count = self.users.count
-    #     self.assertEqual(count, 2)
-    #
-    # def test_columns(self):
-    #     cols = self.users.columns
-    #     self.assertListEqual(cols, ['id', 'name'])
-    #
-    #     self.users.add_column('email', 'varchar(255)')
-    #     cols = self.users.columns
-    #     self.assertListEqual(cols, ['id', 'name', 'email'])
-    #
-    #     definition = self.users.get_column_definition('email')
-    #     self.assertEqual(definition, 'varchar(255)')
-    #
-    #     self.users.rename_column('email', 'email_address')
-    #     cols = self.users.columns
-    #     self.assertListEqual(cols, ['id', 'name', 'email_address'])
-    #
-    #     self.users.drop_column('email_address')
-    #     cols = self.users.columns
-    #     self.assertListEqual(cols, ['id', 'name'])
-    #
-    #     self.users.add_column('active', 'bool NOT NULL default true')
-    #     definition = self.users.get_column_definition('active')
-    #     self.assertEqual(definition, 'bool NOT NULL default true')
-    #
-    #     self.users.alter_column('active', 'SET default false')
-    #     definition = self.users.get_column_definition('active')
-    #     self.assertEqual(definition, 'bool NOT NULL default false')
-    #
-    #     self.users.drop_column('active')
-    #
+
+    def test_count(self):
+        count = self.users.count
+        self.assertEqual(count, 2)
+
+    def test_columns(self):
+        cols = self.users.columns
+        self.assertListEqual(cols, ['id', 'name'])
+
+        self.users.add_column('email', 'varchar(255)')
+        cols = self.users.columns
+        self.assertListEqual(cols, ['id', 'name', 'email'])
+
+        definition = self.users.get_column_definition('email')
+        self.assertEqual(definition, 'varchar(255)')
+
+        self.users.rename_column('email', 'email_address')
+        cols = self.users.columns
+        self.assertListEqual(cols, ['id', 'name', 'email_address'])
+
+        self.users.drop_column('email_address')
+        cols = self.users.columns
+        self.assertListEqual(cols, ['id', 'name'])
+
+        self.users.add_column('active', 'bool NOT NULL default true')
+        definition = self.users.get_column_definition('active')
+        self.assertEqual(definition, 'tinyint(1) NOT NULL')
+
+        self.users.alter_column('active', 'tinyint(1) NOT NULL default false')
+        definition = self.users.get_column_definition('active')
+        self.assertEqual(definition, 'tinyint(1) NOT NULL')
+
+        self.users.drop_column('active')
+
     # def test_foreign_key(self):
     #     """Foreign keys that affect a table can be on
     #     the table, or reference that table.
@@ -196,46 +196,47 @@ class TestMySQLTable(unittest.TestCase):
     #
     #     new_address.drop()
     #     address.drop()
-    #
-    # def test_constraints(self):
-    #     constraints = self.employers.constraints
-    #     self.assertEqual(len(constraints), 2)
-    #
-    #     constraints = self.users.constraints
-    #     self.assertEqual(len(constraints), 2)
-    #
-    #     self.employers.add_constraint('UNIQUE', 'name')
-    #     self.assertEqual(len(self.employers.constraints), 3)
-    #
-    #     for constraint in self.employers.constraints:
-    #         if constraint.type == 'UNIQUE':
-    #             self.employers.drop_constraint(constraint.name)
-    #
-    #     self.assertEqual(len(self.employers.constraints), 2)
-    #
-    # def test_indexes(self):
-    #     indices = self.users.indexes
-    #     self.assertIn('pkey', indices[0].name)
-    #     pk = self.users.primary_key
-    #
-    #     i = self.users.get_index(pk.name)
-    #     self.assertEqual(i, indices[0])
-    #
-    #     self.users.add_index(['id, name'], unique=True)
-    #
-    #     indices = self.users.indexes
-    #     self.assertEqual(len(indices), 3)
-    #
-    #     for index in indices:
-    #         if 'pkey' not in index.name:
-    #             self.users.drop_index(index.name)
-    #
-    #     indices = self.users.indexes
-    #     self.assertEqual(len(indices), 1)
-    #
-    # def test_triggers(self):
-    #     triggers = self.users.get_triggers()
-    #     self.assertListEqual(triggers, [])
+
+    def test_constraints(self):
+        constraints = self.employers.constraints
+        self.assertEqual(len(constraints), 2)
+
+        constraints = self.users.constraints
+        self.assertEqual(len(constraints), 2)
+
+        self.employers.add_constraint('UNIQUE', 'name')
+        self.assertEqual(len(self.employers.constraints), 3)
+
+        for constraint in self.employers.constraints:
+            if constraint.type == 'UNIQUE' and constraint.column == 'name':
+                self.employers.drop_constraint(constraint.name)
+
+        self.assertEqual(len(self.employers.constraints), 2)
+
+    def test_indexes(self):
+        indices = self.users.indexes
+        self.assertIn('PRIMARY', indices[0].name)
+        pk = self.users.primary_key
+
+        i = self.users.get_index(pk.name)
+        self.assertEqual(i, indices[0])
+
+        self.users.add_index(['id', 'name'], unique=True)
+
+        indices = self.users.indexes
+        self.assertEqual(len(indices), 4)
+
+        for index in indices:
+            if '_unique' in index.name:
+                self.users.drop_index(index.name)
+                break
+
+        indices = self.users.indexes
+        self.assertEqual(len(indices), 2)
+
+    def test_triggers(self):
+        triggers = self.users.get_triggers()
+        self.assertListEqual(triggers, [])
 
 
 # class TestMySQLMigrationTable(unittest.TestCase):
@@ -409,46 +410,46 @@ class TestMySQLTable(unittest.TestCase):
 #         archive.drop()
 #
 #
-# class TestMySQLUtils(unittest.TestCase):
-#     """Test util functions"""
-#
-#     def test_join_cols(self):
-#         ans = Table._join_cols(['this', 'that', 'something'])
-#         self.assertEqual(ans, 'this, that, something')
-#
-#     def test_join_values(self):
-#         ans = Table._join_values(['this', 1, 7.0, 'that'])
-#         self.assertEqual(ans, "'this', 1, 7.0, 'that'")
-#
-#         with self.assertRaises(TypeError):
-#             Table._join_values([('this', "won't"), 'work'])
-#
-#     def test_join_conditionals(self):
-#         ans = Table._join_equality({'this': 'that', 'something': 3})
-#         self.assertEqual(ans, "this='that', something=3")
-#
-#         with self.assertRaises(TypeError):
-#             Table._join_equality({'this': ("won't", 'work')})
-#
-#     def test_qualify(self):
-#         ans = Table._qualify('mytable', ['col1', 'col2', 'col3'])
-#         self.assertEqual(ans, 'mytable.col1, mytable.col2, mytable.col3')
-#
-#     def test_equals(self):
-#         ans = Table._equals(['this', 'something'], 'new_table', ['that', 'something_else'])
-#         self.assertEqual(ans, 'this=new_table.that, something=new_table.something_else')
-#
-#     def test_dictify(self):
-#         ans = Table._dictify(['col1', 'col2', 'col3'], ['val1', 'val2', 'val3'])
-#         self.assertDictEqual(ans, {'col2': 'val2', 'col3': 'val3', 'col1': 'val1'})
-#
-#     def test_random_string(self):
-#         ans = Table._random_string(5)
-#         self.assertEqual(len(ans), 5)
-#
-#     def test_join_batch_rows(self):
-#         ans = Table._join_batch_rows([('this', 'that'), ('something', "something's else")])
-#         self.assertEqual(ans, "('this', 'that'), ('something', 'something''s else')")
+class TestMySQLUtils(unittest.TestCase):
+    """Test util functions"""
+
+    def test_join_cols(self):
+        ans = Table._join_cols(['this', 'that', 'something'])
+        self.assertEqual(ans, 'this, that, something')
+
+    def test_join_values(self):
+        ans = Table._join_values(['this', 1, 7.0, 'that'])
+        self.assertEqual(ans, "'this', 1, 7.0, 'that'")
+
+        with self.assertRaises(TypeError):
+            Table._join_values([('this', "won't"), 'work'])
+
+    def test_join_conditionals(self):
+        ans = Table._join_equality({'this': 'that', 'something': 3})
+        self.assertEqual(ans, "this='that', something=3")
+
+        with self.assertRaises(TypeError):
+            Table._join_equality({'this': ("won't", 'work')})
+
+    def test_qualify(self):
+        ans = Table._qualify('mytable', ['col1', 'col2', 'col3'])
+        self.assertEqual(ans, 'mytable.col1, mytable.col2, mytable.col3')
+
+    def test_equals(self):
+        ans = Table._equals(['this', 'something'], 'new_table', ['that', 'something_else'])
+        self.assertEqual(ans, 'this=new_table.that, something=new_table.something_else')
+
+    def test_dictify(self):
+        ans = Table._dictify(['col1', 'col2', 'col3'], ['val1', 'val2', 'val3'])
+        self.assertDictEqual(ans, {'col2': 'val2', 'col3': 'val3', 'col1': 'val1'})
+
+    def test_random_string(self):
+        ans = Table._random_string(5)
+        self.assertEqual(len(ans), 5)
+
+    def test_join_batch_rows(self):
+        ans = Table._join_batch_rows([('this', 'that'), ('something', "something's else")])
+        self.assertEqual(ans, "('this', 'that'), ('something', 'something''s else')")
 
 
 if __name__ == '__main__':

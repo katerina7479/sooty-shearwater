@@ -66,9 +66,9 @@ class MySqlCommands(object):
     def column_definition(database_name, tablename, column_name):
         return '''SELECT COLUMN_TYPE, IS_NULLABLE
                  FROM INFORMATION_SCHEMA.COLUMNS
-                 WHERE TABLE_SCHEMA = '%s'
-                 AND TABLE_NAME = '%s'
-                 AND COLUMN_NAME = '%s';'''.format(database_name, tablename, column_name)
+                 WHERE TABLE_SCHEMA = '{}'
+                 AND TABLE_NAME = '{}'
+                 AND COLUMN_NAME = '{}';'''.format(database_name, tablename, column_name)
 
     @staticmethod
     def add_column(tablename, column_name, definition):
@@ -90,10 +90,17 @@ class MySqlCommands(object):
 
     @staticmethod
     def get_constraints(database_name, tablename):
-        return '''SELECT CONSTRAINT_NAME, CONSTRAINT_SCHEMA, TABLE_NAME, CONSTRAINT_TYPE
-                 FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
-                 WHERE INFORMATION_SCHEMA.TABLE_CONSTRAINTS.TABLE_SCHEMA = '{}'
-                 AND INFORMATION_SCHEMA.TABLE_CONSTRAINTS.TABLE_NAME = '{}';'''.format(database_name, tablename)
+        return '''SELECT tc.CONSTRAINT_NAME,
+                  tc.TABLE_NAME,
+                  tc.CONSTRAINT_TYPE,
+                  kcu.COLUMN_NAME
+                 FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS as tc
+                 LEFT OUTER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE as kcu
+                 ON kcu.constraint_name = tc.constraint_name
+                 WHERE tc.TABLE_SCHEMA = '{}'
+                 AND tc.TABLE_NAME = '{}'
+                 AND kcu.TABLE_NAME = '{}'
+                 '''.format(database_name, tablename, tablename)
 
     @staticmethod
     def add_check_not_null(tablename, column):
@@ -120,7 +127,7 @@ class MySqlCommands(object):
 
     @staticmethod
     def drop_constraint(tablename, constraint_name):
-        return 'ALTER TABLE {} DROP CONSTRAINT {};'.format(tablename, constraint_name)
+        return 'ALTER TABLE {} DROP KEY `{}`;'.format(tablename, constraint_name)
 
     @staticmethod
     def foreign_keys(database_name, tablename):
@@ -172,18 +179,18 @@ class MySqlCommands(object):
     @staticmethod
     def add_index(tablename, index_name, columns, unique=False):
         unique_str = 'UNIQUE' if unique else ''
-        return '''ALTER TABLE {}
-                  ADD {} INDEX {}
-                  ({})
+        return '''ALTER TABLE {tablename}
+                  ADD {unique} INDEX {name}
+                  ({cols})
                '''.format(
-            tablename,
-            unique_str,
-            index_name,
-            columns)
+            tablename=tablename,
+            unique=unique_str,
+            name=index_name,
+            cols=columns)
 
     @staticmethod
     def drop_index(tablename, index_name):
-        return 'ALTER TABLE {} DROP INDEX IF EXISTS {}'.format(tablename, index_name)
+        return 'ALTER TABLE {} DROP INDEX `{}`'.format(tablename, index_name)
 
     @staticmethod
     def min_pk(tablename, primary_key_col):

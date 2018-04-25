@@ -201,7 +201,7 @@ class Table(object):
     @property
     def constraints(self):
         """Get the constraints on the table"""
-        ans = self.execute(self.commands.get_constraints(self.name))
+        ans = self.execute(self.commands.get_constraints(self.db.name, self.name))
         return [Constraint(*tup) for tup in ans]
 
     @property
@@ -327,14 +327,14 @@ class Table(object):
         """Add an index to the table"""
         columns = self._join_cols(column_list)
         if not name:
-            name = self.new_index_name(columns, unique)
+            name = self.new_index_name('_'.join(column_list), unique)
 
         self.execute(self.commands.add_index(self.name, name, columns, unique))
         self.commit()
 
     def drop_index(self, index_name):
         """Drop an index from the table"""
-        self.execute(self.commands.drop_index(index_name))
+        self.execute(self.commands.drop_index(self.name, index_name))
 
     # Naming
     def new_fk_index_name(self, column, fk_column):

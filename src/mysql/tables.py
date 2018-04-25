@@ -1,6 +1,7 @@
 import time
 import re
 from src.core.tables import Table, MigrationTable
+from src.core.constraints import Index
 
 
 class MysqlTable(Table):
@@ -75,10 +76,16 @@ class MysqlTable(Table):
         query = self.commands.get_table_create_statement(self.name)
         if self.db.table_exists(self.name):
             statement = self.execute(query)[0][1]
-            print("statement", statement)
             statement = re.sub('\s+', ' ', statement)
             return statement
         raise ValueError('Table does not exist, no create statement')
+
+
+    @property
+    def indexes(self):
+        """Return list of indexes"""
+        indexes = self.execute(self.commands.get_indexes(self.name))
+        return [Index(tup[0], tup[2], tup[1], tup[4]) for tup in indexes]
 
 
 class MySqlMigrationTable(MysqlTable, MigrationTable):

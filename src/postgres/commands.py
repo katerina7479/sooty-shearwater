@@ -183,7 +183,7 @@ class PostgresCommands(object):
         return 'ALTER TABLE {} RENAME COLUMN {} TO {}'.format(tablename, old_name, new_name)
 
     @staticmethod
-    def get_constraints(tablename):
+    def get_constraints(database_name, tablename):
         return '''SELECT tc.constraint_name,
                  tc.table_name,
                  tc.constraint_type,
@@ -315,7 +315,7 @@ class PostgresCommands(object):
             columns)
 
     @staticmethod
-    def drop_index(index_name):
+    def drop_index(tablename, index_name):
         return 'DROP INDEX IF EXISTS {}'.format(index_name)
 
     @staticmethod
