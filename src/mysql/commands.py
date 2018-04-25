@@ -124,10 +124,12 @@ class MySqlCommands(object):
 
     @staticmethod
     def foreign_keys(database_name, tablename):
-        return '''SELECT * FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
-                 WHERE TABLE_SCHEMA = '{}'
-                 AND TABLE_NAME = '{}'
-        '''.format(database_name, tablename)
+        return '''SELECT CONSTRAINT_NAME, TABLE_NAME, COLUMN_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME,
+         CASE WHEN REFERENCED_TABLE_NAME='{tablename}' THEN TRUE ELSE FALSE END as selfref
+         FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+                 WHERE TABLE_SCHEMA = '{dbname}'
+                 AND TABLE_NAME = '{tablename}'
+        '''.format(dbname=database_name, tablename=tablename)
 
     @staticmethod
     def foreign_key_exists(database_name, table_name, column_name, referenced_table, referenced_column):

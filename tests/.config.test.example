@@ -1,5 +1,11 @@
 [POSTGRES_TEST_DB]
-dbname: template1
+dbname: testdb
+user: dbuser
+host: localhost
+password: dbpass
+
+[MYSQL_TEST_DB]
+dbname: testdb
 user: dbuser
 host: localhost
 password: dbpass

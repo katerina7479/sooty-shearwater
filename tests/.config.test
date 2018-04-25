@@ -3,3 +3,9 @@ dbname: testing
 user: katerina
 host: localhost
 password:
+
+[MYSQL_TEST_DB]
+dbname: testdb
+user: root
+host: localhost
+password:

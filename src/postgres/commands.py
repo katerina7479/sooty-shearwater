@@ -225,7 +225,7 @@ class PostgresCommands(object):
         return 'ALTER TABLE {} DROP CONSTRAINT {};'.format(tablename, constraint_name)
 
     @staticmethod
-    def foreign_keys(tablename):
+    def foreign_keys(database_name, tablename):
         return '''SELECT tc.constraint_name,
                  tc.table_name,
                  kcu.column_name,

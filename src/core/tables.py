@@ -241,7 +241,7 @@ class Table(object):
     @property
     def foreign_keys(self):
         """Return list of foreign_key constraints"""
-        ans = self.execute(self.commands.foreign_keys(self.name))
+        ans = self.execute(self.commands.foreign_keys(self.db.name, self.name))
         return [ForeignKey(*tup) for tup in ans]
 
     def get_foreign_key(self, name):

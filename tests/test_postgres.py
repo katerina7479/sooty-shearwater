@@ -320,7 +320,7 @@ class TestPostgresMigrationTable(unittest.TestCase):
         archive.drop()
 
 
-class TestComplexMigrations(unittest.TestCase):
+class TestPostgresComplexMigrations(unittest.TestCase):
 
     def setUp(self):
         self.connection = psycopg2.connect(**TEST_DB)
@@ -402,7 +402,7 @@ class TestComplexMigrations(unittest.TestCase):
         archive.drop()
 
 
-class TestUtils(unittest.TestCase):
+class TestPostgresUtils(unittest.TestCase):
     """Test util functions"""
 
     def test_join_cols(self):
