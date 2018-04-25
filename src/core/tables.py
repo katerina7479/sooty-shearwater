@@ -538,14 +538,17 @@ class MigrationTable(Table):
             self.start_time = datetime.datetime.now()
 
             pointer = start
-            while pointer < limit:
-                self._copy_chunk(pointer)
-                pointer = self._get_next_pk(pointer)
-                self.log(start, pointer, limit)
-                time.sleep(throttle)
-            if pointer == limit:
-                self._copy_chunk(pointer)
-                self.log(start, pointer, limit)
+            if not pointer or limit:
+                pass
+            else:
+                while pointer < limit:
+                    self._copy_chunk(pointer)
+                    pointer = self._get_next_pk(pointer)
+                    self.log(start, pointer, limit)
+                    time.sleep(throttle)
+                if pointer == limit:
+                    self._copy_chunk(pointer)
+                    self.log(start, pointer, limit)
 
         print('Copy complete! Adding referenced foreign keys')
         referenced_fks = [x for x in self.source.foreign_keys if x.referenced]

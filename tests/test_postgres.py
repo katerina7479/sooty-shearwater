@@ -238,7 +238,7 @@ class TestPostgresMigrationTable(unittest.TestCase):
         dbf = DatabaseFactory(TEST_DB['dbname'], self.connection)
         self.db = dbf.fetch()
         self.users = self.db.table('users')
-        self.users.drop()
+        self.users.drop(cascade=True)
 
         self.users.create_from_statement('''
             CREATE TABLE users (
@@ -258,7 +258,7 @@ class TestPostgresMigrationTable(unittest.TestCase):
                                'city': 'Malibu', 'state': 'CA', 'zip': 90265})
 
     def tearDown(self):
-        self.users.drop()
+        self.users.drop(cascade=True)
 
     def test_migrate(self):
         new_users = self.db.migration_table(self.users)

@@ -362,7 +362,7 @@ class PostgresCommands(object):
 
     @staticmethod
     def set_sequence_owner(sequence_name, tablename, column):
-        return 'ALTER SEQUENCE {} OWNED BY {table}.{col}'.format(
+        return 'ALTER SEQUENCE {} OWNED BY {}.{}'.format(
             sequence_name,
             tablename,
             column
